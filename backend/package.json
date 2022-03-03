@@ -6,6 +6,7 @@
   },
   "dependencies": {
     "ronin-mocks": "^0.1.6",
-    "ronin-server": "^0.1.1"
+    "ronin-server": "^0.1.1",
+    "tedis": "^0.1.12"
   }
 }

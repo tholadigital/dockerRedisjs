@@ -1,25 +1,40 @@
-const ronin 		= require( 'ronin-server' )
-const mocks 		= require( 'ronin-mocks' )
-const database	= require( 'ronin-database' )
+const { Tedis, TedisPool } = require("tedis");
+var http = require('http');
+var fs = require('fs');
 
-async function main() {
 
-	try {
+var REDIS_URL = process.env.REDIS_URL
+console.log("REDIS_URL ", REDIS_URL)
 
-    const server = ronin.server({
-			port: process.env.PORT || 8080
+
+
+async function main(){
+	try{
+		const tedis = new Tedis({
+		  port: 6379,
+		  host: REDIS_URL
+		});
+
+		await tedis.get("getName").then(x=>{
+			console.log("test",x)
 		})
 
-		server.use( '/services/m/', mocks.server( server.Router(), false, true ) )
-
-    const result = await server.start()
-    console.info( result )
-
-	} catch( error ) {
-		console.error( error )
+		http.createServer(async function (req, res) {
+	    console.log(req.headers.host, "headers")
+	    //res.writeHead(301, { "Location": "https://" + req.headers['host'] + req.url });
+	   		//res.end();
+	   		await tedis.set("getName", "Gift Tshepang Mogeni")
+			await tedis.get("getName").then(x=>{
+			console.log("test",x)
+			res.end(x)
+			})
+		}).listen(8084)
+	}catch(err){
+		console.log(err)
 	}
-
+	
 }
+
 
 function shutdown( signal ) {
 	console.info( `[${signal}] shutting down...` )
